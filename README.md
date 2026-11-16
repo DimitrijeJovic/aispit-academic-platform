@@ -20,7 +20,7 @@
   <a href="#15-live-application-deployment">Live Demo</a>
 </p>
 
-> 📌 **Featured Portfolio Showcase:** AIspit serves as the primary software engineering portfolio project on my GitHub profile. This repository is an in-depth, documentation-only engineering presentation detailing the system architecture, relational database design, application security mechanisms, testing methodology, and development telemetry. Proprietary application source code is withheld in accordance with institutional policy.
+> **Featured Portfolio Showcase:** AIspit serves as the primary software engineering portfolio project on my GitHub profile. This repository is an in-depth, documentation-only engineering presentation detailing the system architecture, relational database design, application security mechanisms, testing methodology, and development telemetry. Proprietary application source code is withheld in accordance with institutional policy.
 
 ---
 
@@ -108,7 +108,7 @@ AIspit implements a classical **3-Tier Layered Architecture** following the **Mo
    - **Zero ORM Overhead:** Direct execution via `mysql-connector-python` using parameterized SQL prepared statements.
    - Universal soft deletion (`DeletedAt IS NULL`) across all 23 operational tables.
 
-> 📖 *For a deep dive into module relationships, request lifecycles, and design patterns, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).*
+> *For a deep dive into module relationships, request lifecycles, and design patterns, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).*
 
 ---
 
@@ -180,7 +180,7 @@ When a student launches an exam, AIspit performs an atomic **deep snapshot**:
 - Options are copied into `studenttestodgovor` (freezing choice text and candidate-shuffled order).
 - Student responses link exclusively to the snapshot records.
 
-> 📖 *For complete table specifications, column data types, foreign key mappings, and indexing strategies, see [docs/DATABASE_DESIGN.md](docs/DATABASE_DESIGN.md).*
+> *For complete table specifications, column data types, foreign key mappings, and indexing strategies, see [docs/DATABASE_DESIGN.md](docs/DATABASE_DESIGN.md).*
 
 ---
 
@@ -293,7 +293,7 @@ AIspit adheres to defensive OWASP standards across all endpoints:
 - **Signed Client Sessions:** High-entropy signed session cookies containing minimal identity claims (`korisnik_id`, `uloga`), with live database checks reflecting immediate account suspensions.
 - **The Public Upload Directory Vulnerability Case Study:** Early development stored student files in `app/static/uploads/`, which bypassed authentication and allowed direct URL downloads. This was discovered during an internal audit and permanently remediated by relocating storage outside the static root (`/uploads/`) and establishing an authenticated, ownership-verified streaming endpoint.
 
-> 📖 *For detailed security specifications, threat models, and cryptographic controls, see [docs/SECURITY.md](docs/SECURITY.md).*
+> *For detailed security specifications, threat models, and cryptographic controls, see [docs/SECURITY.md](docs/SECURITY.md).*
 
 ---
 
@@ -346,7 +346,7 @@ Total Version-Controlled Commits: 110
 - **Effort Relocation:** AI does not reduce overall engineering effort; it relocates effort from manual syntax writing to rigorous review, architectural verification, and defensive testing.
 - **Velocity Dynamics:** Over 50% of commits were generated in the final 5 days of development (peak of 22 commits in a single day), reflecting that AI dramatically accelerates execution once architectural decisions have been solidified by the engineer.
 
-> 📖 *For full case studies of AI failures, prompt engineering patterns, and empirical insights, see [docs/AI_ASSISTED_DEVELOPMENT.md](docs/AI_ASSISTED_DEVELOPMENT.md).*
+> *For full case studies of AI failures, prompt engineering patterns, and empirical insights, see [docs/AI_ASSISTED_DEVELOPMENT.md](docs/AI_ASSISTED_DEVELOPMENT.md).*
 
 ---
 
@@ -371,7 +371,7 @@ AIspit is deployed in production on the institutional infrastructure of the Acad
 - **Web Server Topology:** Nginx Reverse Proxy with TLS/SSL termination fronting a Gunicorn WSGI pre-fork worker pool.
 - **Secure File Storage:** Storage path (`/uploads/`) is physically separated from the static web root, preventing unauthorized file access.
 
-> 📖 *For deployment configurations, Nginx configurations, and environment variable requirements, see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).*
+> *For deployment configurations, Nginx configurations, and environment variable requirements, see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).*
 
 ---
 
