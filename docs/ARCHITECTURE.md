@@ -1,12 +1,14 @@
 # AIspit — System Architecture & Engineering Design
 
+> **Verification note.** This document was written from the private source code, which is not published. Statements that go beyond the bachelor's thesis (for example exact limits, file names, function names, and file types) cannot be checked from this repository and should be read as unverified.
+
 This document details the software architecture, design patterns, module organization, request life cycle, and infrastructural considerations of **AIspit** (*Sistem za elektronsku predaju radova i organizaciju onlajn ispita*).
 
 ---
 
 ## 1. Architectural Philosophy & Constraints
 
-AIspit was engineered under strict academic and operational constraints established at the **Academy of Technical and Educational Vocational Studies in Niš (ATVSS Niš)**:
+AIspit was engineered under strict academic and operational constraints established at the **Academy of Applied Technical and Preschool Studies Niš** (*Akademija tehničko-vaspitačkih strukovnih studija*):
 
 1. **Laboratory Self-Containment (Zero External CDN Dependency):** The platform is designed to operate seamlessly in isolated computer examination laboratories without public internet access. All assets—including stylesheets, vendor icons (`Bootstrap Icons`), and client libraries—are bundled locally.
 2. **Server-Authoritative Business Logic:** Client-side user agents are strictly treated as untrusted presentation and notification layers. All decisions regarding authentication, authorization, time boundaries, grading, file authenticity, and exam termination are executed exclusively on the server.
@@ -32,7 +34,6 @@ AIspit adopts a classical **3-Tier Layered Architecture** following the **Model-
                                     v
 +-------------------------------------------------------------------------+
 |                             APPLICATION TIER                            |
-|  WSGI Server (Gunicorn / uWSGI) <-> Reverse Proxy (Nginx)               |
 |  Flask Core Framework (Application Factory: create_app)                 |
 |                                                                         |
 |  +-------------------------------------------------------------------+  |
@@ -182,7 +183,7 @@ Every incoming HTTP request must pass through three distinct authorization check
 
 ### 5.1 Authentication Subsystem (`app/routes/auth.py`, `app/models/korisnik.py`)
 - **Closed Registration Policy:** Self-registration is strictly disabled. Student and faculty accounts are provisioned exclusively by administrators or imported via institutional CSV rosters.
-- **Cryptographic Password Hashing:** User passwords are never persisted in plaintext. Passwords are processed using Werkzeug’s secure hashing algorithms (`scrypt`/`pbkdf2:sha256`) incorporating per-user cryptographically random salts.
+- **Cryptographic Password Hashing:** User passwords are never persisted in plaintext. Passwords are processed using Werkzeug's password hashing with a random salt per password (the algorithm is not named in the thesis).
 - **Tamper-Proof Client Session:** Session tokens are stored in cryptographically signed client cookies using the application's private `SECRET_KEY`. Session payload contains strictly minimal identity claims (`korisnik_id`, `uloga`); full entity attributes are fetched fresh from MySQL on every request to reflect immediate permission revocations or deactivations.
 - **Uniform Error Messaging:** Login validation emits generic error feedback (`"Неисправни приступни подаци"`) regardless of whether the email or password failed, preventing user enumeration attacks.
 
@@ -207,8 +208,7 @@ Every incoming HTTP request must pass through three distinct authorization check
   ```
 - **Brute-Force Rate Limiting:** Enforces a maximum of 5 code validation attempts per minute per student, logging client IP, timestamp, and failure cause to `PokusajPredaje`.
 - **MIME Magic-Byte Verification:** Uploaded streams are inspected for real binary signatures (e.g., `%PDF`, `PK\x03\x04`), rejecting executable files masquerading as archives or documents.
-- **Keyed Submission Integrity Verification (HMAC-SHA256):** Every accepted submission calculates a message authentication code (MAC) over candidate identity, session ID, server timestamp, and the SHA-256 binary hash of the uploaded file:
-  $$\text{HMAC} = \mathcal{H}_{K}(\text{StudentID} \parallel \text{PrijavaID} \parallel \text{Timestamp} \parallel \text{FileSHA256})$$
+- **Keyed Submission Integrity Verification (HMAC):** Every accepted submission gets a message authentication code computed with a separate signing key (Python `hmac`). The exact fields and hash function are not documented in the thesis.
   Any direct modification of database records or file payload on the disk breaks verification.
 
 ---
@@ -217,7 +217,7 @@ Every incoming HTTP request must pass through three distinct authorization check
 
 The standard request lifecycle across AIspit follows a deterministic sequence:
 
-1. **Ingress:** Nginx terminates TLS/SSL and proxies the HTTP request to the WSGI application server.
+1. **Ingress:** The request reaches the Flask application (the production server configuration is not documented in the thesis).
 2. **Context Creation:** Flask's application factory instantiates application and request contexts.
 3. **Database Attachment (`get_db()`):** A dedicated MySQL connection is retrieved or opened, stored in `flask.g.db`. The session timezone is initialized to `SET time_zone = '+01:00'` (or `+02:00` CEST).
 4. **Middleware & Routing:** Flask matches URL patterns against registered Blueprints.
@@ -225,7 +225,7 @@ The standard request lifecycle across AIspit follows a deterministic sequence:
 6. **Domain Execution:** Controller invokes plain Python model methods. Models execute parameterized SQL queries over `g.db`.
 7. **Template Rendering:** Jinja2 renders HTML with contextual parameters, resolving macro components and active UI theme.
 8. **Teardown & Cleanup (`close_db()`):** On request completion, `app.teardown_appcontext` closes cursors and returns/closes the MySQL connection. If an unhandled exception occurred, rollback is triggered.
-9. **Egress:** HTTP response with appropriate status code and headers is returned to Nginx and delivered to the client.
+9. **Egress:** The HTTP response is returned to the client.
 
 ---
 

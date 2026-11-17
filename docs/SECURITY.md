@@ -1,5 +1,7 @@
 # AIspit — Security Architecture & Threat Mitigation
 
+> **Verification note.** This document was written from the private source code, which is not published. Statements that go beyond the bachelor's thesis (for example exact limits, file names, function names, and file types) cannot be checked from this repository and should be read as unverified.
+
 This document details the defensive security architecture, authentication mechanisms, authorization boundaries, cryptographic controls, and threat mitigations implemented in **AIspit** (*Sistem za elektronsku predaju radova i organizaciju onlajn ispita*).
 
 ---
@@ -85,7 +87,7 @@ def _check_prijava_ownership(prijava_id, profesor_id):
 ## 3. Cryptography & Credential Management
 
 ### 3.1 Password Storage & Hash Derivation
-- **Algorithm:** Passwords are never stored or logged in plaintext. They are hashed using **Werkzeug's security framework** utilizing modern salted scrypt or PBKDF2:SHA256 implementations with a high work factor.
+- **Algorithm:** Passwords are never stored or logged in plaintext. They are hashed using **Werkzeug's security framework** with a random salt per password (the algorithm and work factor are not named in the thesis).
 - **Salting:** Each hash incorporates an automatically generated cryptographic salt, preventing rainbow-table precomputation attacks.
 - **Zero Exposure on Batch Import:** When administrators batch-import students from tabular rosters, temporary passwords are generated in-memory. Only the derived cryptographic hash is persisted to MySQL; the raw passwords are rendered once on the administrative confirmation screen and are never retrievable by any API or administrative endpoint thereafter.
 
@@ -152,7 +154,7 @@ During development, a serious vulnerability was uncovered: uploaded student assi
 ### 5.4 HMAC-SHA256 Submission Integrity Verification (MAC)
 To detect any unauthorized replacement, backdating, or modification of student files and submission records after the deadline, each submission generates a keyed HMAC-SHA256 message authentication code (MAC):
 
-$$\text{MAC} = \text{HMAC-SHA256}\Big(K_{\text{secret}}, \text{StudentID} \parallel \text{PrijavaID} \parallel \text{AktivacioniKodID} \parallel \text{ServerTimestamp} \parallel \text{FileSHA256}\Big)$$
+The exact fields covered by the MAC and the hash function are not documented in the thesis and are omitted here.
 
 - The calculated MAC is stored in `predaja.SubmissionKey`.
 - Faculty can click **"Провери потпис"** (the UI integrity check button) on any submission to recompute the HMAC-SHA256 code using the server's secret key and verify that neither the record nor the file has been modified. Any direct database tampering (e.g., modifying the timestamp from 03:08 to 02:00, or replacing the file on disk) causes the verification check to fail.

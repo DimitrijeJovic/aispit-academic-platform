@@ -1,5 +1,7 @@
 # AIspit — Database Architecture & Relational Design
 
+> **Verification note.** This document was written from the private source code, which is not published. Statements that go beyond the bachelor's thesis (for example exact limits, file names, function names, and file types) cannot be checked from this repository and should be read as unverified.
+
 This document provides a comprehensive technical breakdown of the database schema for **AIspit** (*Sistem za elektronsku predaju radova i organizaciju onlajn ispita*), implemented on **MySQL 8.0** using the **InnoDB** storage engine.
 
 ---
@@ -102,7 +104,7 @@ In a purely normalized database, student attempts would link directly via foreig
 | :--- | :--- | :--- | :--- |
 | `ID` | INT UNSIGNED | PK, AUTO_INCREMENT | Unique user identifier |
 | `Email` | VARCHAR(255) | NOT NULL, UNIQUE | University institutional email address |
-| `PasswordHash` | VARCHAR(255) | NOT NULL | Werkzeug-generated password hash (salt + scrypt/pbkdf2) |
+| `PasswordHash` | VARCHAR(255) | NOT NULL | Werkzeug-generated salted password hash |
 | `Uloga` | ENUM | NOT NULL | Role: `'admin'`, `'profesor'`, `'asistent'`, `'student'` |
 | `Status` | ENUM | NOT NULL, DEFAULT `'aktivan'` | Account status: `'aktivan'`, `'neaktivan'`, `'blokiran'` |
 | `CreatedAt` | DATETIME | NOT NULL | Record creation timestamp |

@@ -1,5 +1,7 @@
 # AIspit — AI-Assisted Software Engineering & Empirical Analysis
 
+> **Verification note.** This document was written from the private source code, which is not published. Statements that go beyond the bachelor's thesis (for example exact limits, file names, function names, and file types) cannot be checked from this repository and should be read as unverified.
+
 This document details the methodology, tool ecosystem, empirical version-control statistics, iterative failure cases, and verification framework governing the use of **Generative Artificial Intelligence (AI)** in the engineering of **AIspit** (*Sistem za elektronsku predaju radova i organizaciju onlajn ispita*).
 
 ---
